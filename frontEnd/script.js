@@ -1,13 +1,14 @@
-window.addEventListener("DOMContentLoaded",()=>{
-    axios.get("http://localhost:3000/get-expenses")
-    .then(result=>{
+window.addEventListener("DOMContentLoaded",async()=>{
+    try{
+        const result=await axios.get("http://localhost:3000/get-expenses");
         result.data.forEach(element => {
             display(element);
         });
-    })
-    .catch(err=>{
+
+    }
+    catch(err){
         console.log(err);
-    })
+    }
 })
 
 //Add Expence
@@ -15,25 +16,27 @@ var price = document.getElementById("price");
 var desc = document.getElementById("desc");
 var cat = document.getElementById("cat");
 document.querySelector("input[type=submit]").addEventListener("click", store);
-function store(e) {
+async function store(e) {
     e.preventDefault();
     var obj = {
         amount: price.value,
         description: desc.value,
         category: cat.value
     }
-    axios.post("http://localhost:3000/add-expenses", obj)
-        .then((result) => {
-            console.log(result.data._id)
-            obj.id = result.data._id;
-            display(obj);
-            //removing values from input field
-            price.value = "";
-            desc.value = "";
-            cat.value = "";
-        }).catch((err) => {
+    try{
+        const result=await axios.post("http://localhost:3000/add-expenses", obj);
+        console.log(result.data._id)
+        obj.id = result.data._id;
+        display(obj);
+        //removing values from input field
+        price.value = "";
+        desc.value = "";
+        cat.value = "";
+
+    }
+    catch(err){
             console.log(err);
-        });
+        };
 }
 //displey funciton
 function display(obj) {
@@ -58,7 +61,7 @@ function display(obj) {
 }
 //DeleteExpense
 document.getElementById("dest").addEventListener("click", manipulate);
-function manipulate(e) {
+async function manipulate(e) {
     if (e.target.classList.contains("delete") || e.target.classList.contains("edit")) {
         console.log("delete");
         var parent = e.target.parentElement;
@@ -66,20 +69,27 @@ function manipulate(e) {
         if (e.target.classList.contains("edit")) {
             console.log("edit");
             //get req
-            axios.get("http://localhost:3000/get-expenses/" + key)
-                .then(result => {
-                    obj = result.data;
-                    // console.log(obj);
-                    price.value = obj.amount;
-                    desc.value = obj.description;
-                    cat.value = obj.category;
-                })
+            try{
+                const result=await axios.get("http://localhost:3000/get-expenses/" + key);
+                obj = result.data;
+                // console.log(obj);
+                price.value = obj.amount;
+                desc.value = obj.description;
+                cat.value = obj.category;
+
+            }
+            catch(err){
+                console.log(err);
+            }
         }
         //delete req
-        axios.delete("http://localhost:3000/delete-expenses/" + key)
-            .then(result => {
-                console.log("deleted");
+        try{
+            const result= await axios.delete("http://localhost:3000/delete-expenses/" + key)
+            console.log("deleted");
                 parent.remove();
-            })
+        }
+        catch(err){
+            console.log(err);
+        }
     }
 }
